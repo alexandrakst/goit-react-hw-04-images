@@ -24,7 +24,7 @@ export const ImageGallery = ({ searchInput }) => {
     )
       .then(response => response.json())
       .then(images => setImages(images.hits))
-      .then(images => setImages(images.totalHits))
+
       .finally(() => setLoading(false));
   }, [searchInput]);
 
@@ -43,9 +43,7 @@ export const ImageGallery = ({ searchInput }) => {
               <ImageGalleryItem image={image} key={image.id} />
             ))}
         </ul>
-        {images.length >= 12 && (
-          <Button searchInput={searchInput} onLoadMore={onLoadMore} />
-        )}
+        {images && <Button searchInput={searchInput} onLoadMore={onLoadMore} />}
       </>
     );
 };
