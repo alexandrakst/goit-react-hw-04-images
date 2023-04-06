@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader } from 'components/Loader/Loader';
 import PropTypes from 'prop-types';
 import css from './Button.module.css';
@@ -6,50 +6,41 @@ import css from './Button.module.css';
 const BASE_URL = 'https://pixabay.com/api';
 const API_KEY = '33593271-922b400b6ee77099ecc074fd7';
 
-export class Button extends Component {
-  state = {
-    page: 1,
-    loading: false,
-  };
+export const Button = ({ searchInput, onLoadMore }) => {
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  componentDidUpdate(prevProps, _) {
-    if (prevProps.searchInput !== this.props.searchInput) {
-      this.setState({ page: 1 });
-    }
-  }
+  useEffect(() => {
+    setPage(1);
+  }, [searchInput]);
 
-  onLoadMore = () => {
-    this.setState({ loading: true });
+  const loadMore = () => {
+    setLoading(true);
 
     fetch(
-      `${BASE_URL}/?q=${this.props.searchInput}&page=${
-        this.state.page + 1
+      `${BASE_URL}/?q=${searchInput}&page=${
+        page + 1
       }&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
     )
       .then(response => response.json())
       .then(images => {
-        this.props.onLoadMore(images.hits);
+        onLoadMore(images.hits);
       })
-      .finally(() => this.setState({ loading: false }));
+      .finally(() => setLoading(false));
 
-    this.setState((prevState, props) => ({
-      page: prevState.page + 1,
-    }));
+    setPage(prevState => prevState + 1);
   };
 
-  render() {
-    if (this.state.loading) {
-      return <Loader />;
-    } else if (this.state.page * 12 >= this.props.total) {
-      return null;
-    } else
-      return (
-        <button className={css.button} onClick={this.onLoadMore}>
-          Load more
-        </button>
-      );
-  }
-}
+  if (loading) {
+    return <Loader />;
+  } else
+    return (
+      <button className={css.button} onClick={loadMore}>
+        Load more
+      </button>
+    );
+};
+
 Button.propTypes = {
   searchInput: PropTypes.string.isRequired,
   onLoadMore: PropTypes.func.isRequired,
