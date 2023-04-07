@@ -10,6 +10,7 @@ const API_KEY = '33593271-922b400b6ee77099ecc074fd7';
 
 export const ImageGallery = ({ searchInput }) => {
   const [images, setImages] = useState(null);
+  const [totalHits, setTotalHits] = useState(0);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -23,10 +24,12 @@ export const ImageGallery = ({ searchInput }) => {
       `${BASE_URL}/?q=${searchInput}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
     )
       .then(response => response.json())
-      .then(images => setImages(images.hits))
-
+      .then(images => {
+        setImages(images.hits);
+        setTotalHits(images.totalHits);
+      })
       .finally(() => setLoading(false));
-  }, [searchInput]);
+  }, [totalHits, searchInput]);
 
   const onLoadMore = loadMoreImages => {
     setImages(prevState => [...prevState, ...loadMoreImages]);
@@ -43,7 +46,13 @@ export const ImageGallery = ({ searchInput }) => {
               <ImageGalleryItem image={image} key={image.id} />
             ))}
         </ul>
-        {images && <Button searchInput={searchInput} onLoadMore={onLoadMore} />}
+        {images && (
+          <Button
+            total={totalHits}
+            searchInput={searchInput}
+            onLoadMore={onLoadMore}
+          />
+        )}
       </>
     );
 };

@@ -6,7 +6,7 @@ import css from './Button.module.css';
 const BASE_URL = 'https://pixabay.com/api';
 const API_KEY = '33593271-922b400b6ee77099ecc074fd7';
 
-export const Button = ({ searchInput, onLoadMore }) => {
+export const Button = ({ searchInput, onLoadMore, total }) => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +33,8 @@ export const Button = ({ searchInput, onLoadMore }) => {
 
   if (loading) {
     return <Loader />;
+  } else if (page * 12 >= total) {
+    return null;
   } else
     return (
       <button className={css.button} onClick={loadMore}>
